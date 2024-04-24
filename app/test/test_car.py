@@ -9,6 +9,8 @@
     -   PUT - /car/register/{number_plate} - Add car to an employee
     -   GET - /car/register/ - GET all registered Cars with employees
     -   GET - /car/register/{emp_name} - GET cars registered for a particular employee
+
+    -   GET - /car/is_registered/{number_plate} - GET number plate is registered or not
 """
 from starlette import status
 
@@ -199,5 +201,29 @@ def test_get_registered_cars_by_emp_name_not_found():
     response = client.get("/car/register/unknown user")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == {'detail': "Car cars found."}
+
+
+def test_is_car_registered_to_emp_true(test_register_car_to_emp):
+    response = client.get("/car/is_registered/ZX10 MNB")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == True
+
+
+def test_is_car_registered_to_emp_false(test_car):
+    response = client.get("/car/is_registered/ZX10 MNB")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == False
+
+
+def test_is_car_registered_to_emp_invalid_number_plate():
+    response = client.get("/car/is_registered/ZX10MN B")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {"detail": "Invalid number plate."}
+
+
+def test_is_car_registered_to_emp_car_not_found():
+    response = client.get("/car/is_registered/ZX10 MNB")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {"detail": "Car not found."}
 
 

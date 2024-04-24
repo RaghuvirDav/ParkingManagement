@@ -9,6 +9,8 @@
     -   PUT - /car/register/{number_plate} - Add car to an employee
     -   GET - /car/register/ - GET all registered Cars with employees
     -   GET - /car/register/{emp_name} - GET cars registered for a particular employee
+
+    -   GET - /car/is_registered/{number_plate} - GET number plate is registered or not
 """
 
 from typing import Annotated
@@ -159,3 +161,20 @@ async def get_registered_cars_by_emp_name(db: db_dependency, emp_name: str):
             b.append(i._asdict())
         return b
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car cars found.")
+
+
+# checks if given number plate is registered or not
+@router.get("/is_registered/{number_plate}", status_code=status.HTTP_200_OK)
+async def is_car_registered_to_emp(db: db_dependency, number_plate: str):
+    number_plate_list = number_plate.split(" ")
+    if " " not in number_plate or len(number_plate_list[0]) != 4 or len(number_plate_list[1]) != 3:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid number plate.")
+
+    car_model = db.query(Cars).filter(Cars.number_plate == number_plate).first()
+    if car_model is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found.")
+
+    if car_model.owner_id is None:
+        return False
+    else:
+        return True
