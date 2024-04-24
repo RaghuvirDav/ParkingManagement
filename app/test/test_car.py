@@ -1,6 +1,9 @@
 """
     Tests API endpoint for car
-    -   POST - /car
+    -   POST - /car - Add a new employee
+    -   GET - /car - Get all cars
+    -   GET - /car/{car_make} - Filter cars by "car_make"
+    -   PUT - /car/{car_id} - Update Car
 """
 from starlette import status
 
@@ -56,3 +59,33 @@ def test_get_car_by_make_not_found():
     response = client.get("/car/unknown_make")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == {'detail': "No cars found."}
+
+
+def test_update_car(test_car):
+    request_data = {
+        'color': 'Black',
+        'make': 'Toyota',
+        'model': 'Fortuner',
+        'number_plate': 'ZX10 MNB'
+    }
+
+    response = client.put("/car/1", json=request_data)
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    db = TestingSessionLocal()
+    model = db.query(Cars).filter(Cars.id == 1).first()
+
+    assert model.color == "Black"
+
+
+def test_update_car_not_found(test_car):
+    request_data = {
+        'color': 'Black',
+        'make': 'Toyota',
+        'model': 'Fortuner',
+        'number_plate': 'ZX10 MNB'
+    }
+
+    response = client.put("/car/1000", json=request_data)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {'detail': "Car not found."}

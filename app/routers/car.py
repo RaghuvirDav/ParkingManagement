@@ -2,11 +2,13 @@
     Defines the API router for:
     -   POST - /car - Add a new employee
     -   GET - /car - Get all cars
+    -   GET - /car/{car_make} - Filter cars by "car_make"
+    -   PUT - /car/{car_id} - Update Car
 """
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from starlette import status
@@ -67,3 +69,20 @@ async def get_car_by_make(db: db_dependency, car_make: str):
     if len(car_model) > 0:
         return car_model
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No cars found.")
+
+
+# Update car
+@router.put("/{car_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def update_car(db: db_dependency,
+                     car_request: CarRequest,
+                     car_id: int = Path(gt=0)):
+    car_model = db.query(Cars).filter(Cars.id == car_id).first()
+    if car_model is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found.")
+
+    car_model.make = car_request.make
+    car_model.model = car_request.model
+    car_model.color = car_request.color
+
+    db.add(car_model)
+    db.commit()
