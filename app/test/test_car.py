@@ -8,6 +8,7 @@
 
     -   PUT - /car/register/{number_plate} - Add car to an employee
     -   GET - /car/register/ - GET all registered Cars with employees
+    -   GET - /car/register/{emp_name} - GET cars registered for a particular employee
 """
 from starlette import status
 
@@ -176,5 +177,27 @@ def test_get_registered_cars_not_found():
     response = client.get("/car/register/")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == {'detail': "No cars found."}
+
+
+def test_get_registered_cars_by_emp_name(test_register_car_to_emp):
+    response = client.get("/car/register/User Name")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == [
+        {
+            'id': 1,
+            'make': 'Toyota',
+            'color': 'White',
+            'model': 'Fortuner',
+            'owner_id': 1,
+            'number_plate': 'ZX10 MNB',
+            'name': 'User Name'
+        }
+    ]
+
+
+def test_get_registered_cars_by_emp_name_not_found():
+    response = client.get("/car/register/unknown user")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {'detail': "Car cars found."}
 
 

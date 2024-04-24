@@ -8,6 +8,7 @@
 
     -   PUT - /car/register/{number_plate} - Add car to an employee
     -   GET - /car/register/ - GET all registered Cars with employees
+    -   GET - /car/register/{emp_name} - GET cars registered for a particular employee
 """
 
 from typing import Annotated
@@ -142,3 +143,19 @@ async def get_registered_cars(db: db_dependency):
             b.append(i._asdict())
         return b
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No cars found.")
+
+
+#  get cars registered for a particular employee
+@router.get("/register/{emp_name}", status_code=status.HTTP_200_OK)
+async def get_registered_cars_by_emp_name(db: db_dependency, emp_name: str):
+    car_list = db.query(Cars.id, Cars.make, Cars.color, Cars.model, Cars.owner_id, Cars.number_plate, Employees.id,
+                        Employees.name).filter(
+        Cars.owner_id is not None and Employees.name == emp_name).join(Employees,
+                                                                       Cars.owner_id == Employees.id).all()
+
+    if len(car_list) > 0:
+        b = []
+        for i in car_list:
+            b.append(i._asdict())
+        return b
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car cars found.")
