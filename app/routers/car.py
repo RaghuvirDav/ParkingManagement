@@ -7,6 +7,7 @@
     -   DELETE - /car/{car_id} - Delete Car
 
     -   PUT - /car/register/{number_plate} - Add car to an employee
+    -   GET - /car/register/ - GET all registered Cars with employees
 """
 
 from typing import Annotated
@@ -125,3 +126,19 @@ async def add_car_to_employee(db: db_dependency, add_car_request: AddCarRequest,
 
     db.add(car_model)
     db.commit()
+
+
+# Get all registered cars
+@router.get("/register/", status_code=status.HTTP_200_OK)
+async def get_registered_cars(db: db_dependency):
+    car_list = db.query(Cars.id, Cars.make, Cars.color, Cars.model, Cars.owner_id, Cars.number_plate, Employees.id,
+                        Employees.name).filter(Cars.owner_id is not None).join(Employees,
+                                                                               Cars.owner_id == Employees.id).all()
+
+    car_list1 = db.query(Cars).all()
+    if len(car_list) > 0:
+        b = []
+        for i in car_list:
+            b.append(i._asdict())
+        return b
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No cars found.")

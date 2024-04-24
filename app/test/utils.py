@@ -78,12 +78,12 @@ def test_emp():
 @pytest.fixture()
 def test_register_car_to_emp(test_car, test_emp):
     request_data = {
-        'color': 'Black',
+        'color': 'White',
         'owner_id': test_emp.id,
         'make': 'Toyota',
         'model': 'Fortuner',
-        'number_plate': 'PO89 JKL'
+        'number_plate': 'ZX10 MNB'
     }
 
-    client.put("/car/register/PO89 JKL", json=request_data)
+    client.put("/car/register/ZX10 MNB", json=request_data)
 

@@ -7,6 +7,7 @@
     -   DELETE - /car/{car_id} - Delete Car
 
     -   PUT - /car/register/{number_plate} - Add car to an employee
+    -   GET - /car/register/ - GET all registered Cars with employees
 """
 from starlette import status
 
@@ -153,3 +154,27 @@ def test_add_car_to_employee_emp_not_found(test_car, test_emp):
     response = client.put("/car/register/ZX10 MNB", json=request_data)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == {'detail': "Employee not found."}
+
+
+def test_get_registered_cars(test_register_car_to_emp):
+    response = client.get("/car/register/")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == [
+        {
+            'id': 1,
+            'make': 'Toyota',
+            'color': 'White',
+            'model': 'Fortuner',
+            'owner_id': 1,
+            'number_plate': 'ZX10 MNB',
+            'name': 'User Name'
+        }
+    ]
+
+
+def test_get_registered_cars_not_found():
+    response = client.get("/car/register/")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {'detail': "No cars found."}
+
+
