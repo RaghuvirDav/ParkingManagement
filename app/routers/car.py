@@ -5,6 +5,8 @@
     -   GET - /car/{car_make} - Filter cars by "car_make"
     -   PUT - /car/{car_id} - Update Car
     -   DELETE - /car/{car_id} - Delete Car
+
+    -   PUT - /car/register/{number_plate} - Add car to an employee
 """
 
 from typing import Annotated
@@ -15,7 +17,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from app.database import SessionLocal
-from app.models import Cars
+from app.models import Cars, Employees
 
 router = APIRouter(
     prefix="/car",
@@ -44,6 +46,14 @@ class CarRequest(BaseModel):
     model: str = Field(min_length=1, default="Yaris")
     color: str = Field(min_length=2, default="White")
     number_plate: str = Field(max_length=8, min_length=8, default="AB01 DEF")
+
+
+class AddCarRequest(BaseModel):
+    """
+                Defines code to validate add_car_to_emp request against defined constrains
+    """
+    number_plate: str = Field(max_length=8, min_length=8, default="AB01 DEF")
+    owner_id: int = Field(gt=0, default=1)
 
 
 # create a car
@@ -97,4 +107,21 @@ async def delete_car(db: db_dependency, car_id: int = Path(gt=0)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found.")
 
     db.query(Cars).filter(Cars.id == car_id).delete()
+    db.commit()
+
+
+# ADD a car to Employee
+@router.put("/register/{number_plate}", status_code=status.HTTP_201_CREATED)
+async def add_car_to_employee(db: db_dependency, add_car_request: AddCarRequest, number_plate: str):
+    car_model = db.query(Cars).filter(Cars.number_plate == number_plate).first()
+    if car_model is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found.")
+
+    emp_model = db.query(Employees).filter(Employees.id == add_car_request.owner_id).first()
+    if emp_model is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found.")
+
+    car_model.owner_id = add_car_request.owner_id
+
+    db.add(car_model)
     db.commit()

@@ -5,6 +5,8 @@
     -   GET - /car/{car_make} - Filter cars by "car_make"
     -   PUT - /car/{car_id} - Update Car
     -   DELETE - /car/{car_id} - Delete Car
+
+    -   PUT - /car/register/{number_plate} - Add car to an employee
 """
 from starlette import status
 
@@ -105,3 +107,49 @@ def test_delete_car_not_found():
     response = client.delete("/car/1000")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == {'detail': "Car not found."}
+
+
+def test_add_car_to_employee(test_car, test_emp):
+    request_data = {
+        'color': 'White',
+        'owner_id': test_emp.id,
+        'make': 'Toyota',
+        'model': 'Fortuner',
+        'number_plate': 'ZX10 MNB'
+    }
+
+    response = client.put("/car/register/ZX10 MNB", json=request_data)
+    assert response.status_code == status.HTTP_201_CREATED
+
+    db = TestingSessionLocal()
+    model = db.query(Cars).filter(Cars.id == 1).first()
+
+    assert model.owner_id == 1
+
+
+def test_add_car_to_employee_car_not_found(test_car, test_emp):
+    request_data = {
+        'color': 'Black',
+        'owner_id': test_emp.id,
+        'make': 'Toyota',
+        'model': 'Fortuner',
+        'number_plate': 'ZX10 MNB'
+    }
+
+    response = client.put("/car/register/ZX10 MNA", json=request_data)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {'detail': "Car not found."}
+
+
+def test_add_car_to_employee_emp_not_found(test_car, test_emp):
+    request_data = {
+        'color': 'Black',
+        'owner_id': 2,
+        'make': 'Toyota',
+        'model': 'Fortuner',
+        'number_plate': 'ZX10 MNB'
+    }
+
+    response = client.put("/car/register/ZX10 MNB", json=request_data)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {'detail': "Employee not found."}
