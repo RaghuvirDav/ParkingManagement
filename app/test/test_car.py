@@ -28,3 +28,17 @@ def test_add_car(test_car):
     assert model.model == request_data.get("model")
     assert model.color == request_data.get("color")
     assert model.number_plate == request_data.get("number_plate")
+
+
+def test_get_all_cars(test_car):
+    response = client.get("/car")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == [
+        {'color': 'White', 'id': 1, 'owner_id': None, 'make': 'Toyota', 'model': 'Fortuner', 'number_plate': 'ZX10 MNB'}
+    ]
+
+
+def test_get_all_cars_not_found():
+    response = client.get("/car")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {'detail': "No cars found."}
