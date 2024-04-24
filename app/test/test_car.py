@@ -1,5 +1,5 @@
 """
-    Tests API endpoint for health
+    Tests API endpoint for car
     -   POST - /car
 """
 from starlette import status
@@ -10,7 +10,7 @@ from ..routers.car import get_db
 app.dependency_overrides[get_db] = override_get_db
 
 
-def test_add_car():
+def test_add_car(test_car):
     request_data = {
         'color': 'Black',
         'make': 'Toyota',
@@ -22,7 +22,7 @@ def test_add_car():
     assert response.status_code == status.HTTP_201_CREATED
 
     db = TestingSessionLocal()
-    model = db.query(Cars).filter(Cars.id == 1).first()
+    model = db.query(Cars).filter(Cars.id == 2).first()
 
     assert model.make == request_data.get("make")
     assert model.model == request_data.get("model")

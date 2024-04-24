@@ -46,8 +46,7 @@ def test_car():
         make="Toyota",
         model="Fortuner",
         color="White",
-        number_plate="RU09 DAV",
-        # owner_id=1
+        number_plate="ZX10 MNB",
     )
 
     db = TestingSessionLocal()
@@ -83,8 +82,8 @@ def test_register_car_to_emp(test_car, test_emp):
         'owner_id': test_emp.id,
         'make': 'Toyota',
         'model': 'Fortuner',
-        'number_plate': 'RU09 DAV'
+        'number_plate': 'PO89 JKL'
     }
 
-    client.put("/car/register/RU09 DAV", json=request_data)
+    client.put("/car/register/PO89 JKL", json=request_data)
 

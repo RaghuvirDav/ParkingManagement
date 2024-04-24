@@ -1,10 +1,12 @@
 """
     Defines the API router for:
-        - Add a new employee
+    -   POST - /emp - Add a new employee
+    -   GET - /emp - Get all employees
+
 """
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from starlette import status
@@ -44,3 +46,12 @@ async def add_emp(db: db_dependency, emp_request: EmpRequest):
     emp_model = Employees(**emp_request.model_dump())
     db.add(emp_model)
     db.commit()
+
+
+# get all employees
+@router.get("/", status_code=status.HTTP_200_OK)
+async def get_all_employees(db: db_dependency):
+    emp_list = db.query(Employees).all()
+    if len(emp_list) > 0:
+        return emp_list
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No employees found.")
