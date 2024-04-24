@@ -58,3 +58,12 @@ async def get_all_cars(db: db_dependency):
     if len(car_list) > 0:
         return car_list
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No cars found.")
+
+
+# get(Filter) cars my make
+@router.get("/{car_make}", status_code=status.HTTP_200_OK)
+async def get_car_by_make(db: db_dependency, car_make: str):
+    car_model = db.query(Cars).filter(Cars.make == car_make).all()
+    if len(car_model) > 0:
+        return car_model
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No cars found.")
