@@ -4,6 +4,7 @@
     -   GET - /car - Get all cars
     -   GET - /car/{car_make} - Filter cars by "car_make"
     -   PUT - /car/{car_id} - Update Car
+    -   DELETE - /car/{car_id} - Delete Car
 """
 
 from typing import Annotated
@@ -85,4 +86,15 @@ async def update_car(db: db_dependency,
     car_model.color = car_request.color
 
     db.add(car_model)
+    db.commit()
+
+
+# Delete a car
+@router.delete("/{car_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_car(db: db_dependency, car_id: int = Path(gt=0)):
+    car_model = db.query(Cars).filter(Cars.id == car_id).first()
+    if car_model is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found.")
+
+    db.query(Cars).filter(Cars.id == car_id).delete()
     db.commit()

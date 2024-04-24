@@ -4,6 +4,7 @@
     -   GET - /car - Get all cars
     -   GET - /car/{car_make} - Filter cars by "car_make"
     -   PUT - /car/{car_id} - Update Car
+    -   DELETE - /car/{car_id} - Delete Car
 """
 from starlette import status
 
@@ -87,5 +88,20 @@ def test_update_car_not_found(test_car):
     }
 
     response = client.put("/car/1000", json=request_data)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json() == {'detail': "Car not found."}
+
+
+def test_delete_car(test_car):
+    response = client.delete("/car/1")
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    db = TestingSessionLocal()
+    model = db.query(Cars).filter(Cars.id == 1).first()
+    assert model is None
+
+
+def test_delete_car_not_found():
+    response = client.delete("/car/1000")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == {'detail': "Car not found."}
