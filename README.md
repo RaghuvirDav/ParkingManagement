@@ -89,7 +89,6 @@ And access the endpoints via browser
 
 #### Available Endpoints
 - /health: Health check endpoint to verify the application is running.
-- /cash_flow/: Main endpoint for cash flow calculation.
 
 ### Step 4: Testing
 Run tests using pytest:
