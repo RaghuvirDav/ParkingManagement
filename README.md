@@ -71,7 +71,7 @@ cd ParkingManagement
 
 
 ```console
-pip install -r .app/requirements.txt
+pip install -r app/requirements.txt
 ```
 
 ### Step 4: Running the Application
@@ -88,8 +88,20 @@ Navigate to ``` http://127.0.0.1:8000/docs```
 And access the endpoints via browser
 
 #### Available Endpoints
-- /health: Health check endpoint to verify the application is running.
+-   GET - /health: Health check endpoint to verify the application is running.
+-   POST - /car - Add a new employee
+-   GET - /car - Get all cars
+-   GET - /car/{car_make} - Filter cars by "car_make"
+-   PUT - /car/{car_id} - Update Car
+-   DELETE - /car/{car_id} - Delete Car
 
+-   PUT - /car/register/{number_plate} - Add car to an employee
+-   GET - /car/register/ - GET all registered Cars with employees
+-   GET - /car/register/{emp_name} - GET cars registered for a particular employee
+
+-   GET - /car/is_registered/{number_plate} - GET number plate is registered or not
+-   POST - /emp - Add a new employee
+-   GET - /emp - Get all employees
 ### Step 4: Testing
 Run tests using pytest:
 
