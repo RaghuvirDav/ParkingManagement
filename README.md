@@ -81,7 +81,14 @@ Start the application with Uvicorn:
 uvicorn app.main:app --reload
 ```
 
-### Step 5: Usage
+### Step 5: Adding given employees to our Database
+
+```console
+python3 add_emp_external.py
+```
+
+
+## Usage
 
 Navigate to ``` http://127.0.0.1:8000/docs``` 
 
@@ -102,7 +109,7 @@ And access the endpoints via browser
 -   GET - /car/is_registered/{number_plate} - GET number plate is registered or not
 -   POST - /emp - Add a new employee
 -   GET - /emp - Get all employees
-### Step 4: Testing
+## Testing
 Run tests using pytest:
 
 ```console
